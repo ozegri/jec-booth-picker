@@ -1,0 +1,17 @@
+{
+  "_comment": "Manual decisions re-applied on every refresh. Booth codes are exactly as they appear on the plan.",
+
+  "reserved": {
+    "5H01": "Reserved",
+    "6J05": "Reserved",
+    "6B35": "Reserved",
+    "6J86": "Reserved"
+  },
+
+  "zones": {
+  },
+
+  "zonePrefixes": {
+    "6H04-": "STARTUP BOOSTER POD"
+  }
+}
