@@ -1,0 +1,35 @@
+name: Refresh booth availability
+
+on:
+  schedule:
+    # 05:10 UTC her gun = Paris'te yazin 07:10, kisin 06:10
+    - cron: "10 5 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Fetch the current floor plan
+        run: node tools/update-booths.mjs
+
+      - name: Commit if anything changed
+        run: |
+          if git diff --quiet -- data/booths.json; then
+            echo "No change in availability today."
+            exit 0
+          fi
+          git config user.name  "booth-picker bot"
+          git config user.email "actions@github.com"
+          git add data/booths.json
+          git commit -m "Refresh booth availability ($(date -u +%Y-%m-%d))"
+          git push
