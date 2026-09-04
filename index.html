@@ -182,6 +182,45 @@ ul.incl li::marker{color:var(--free)}
 a.mail{display:inline-block;margin-top:10px;color:var(--deep);font-size:13px}
 .lightbox img{max-width:min(1150px,94vw);max-height:90vh;border-radius:4px;display:block;cursor:zoom-out}
 
+/* --- action block at the top of the detail panel --- */
+.act{margin-top:14px;display:flex;flex-direction:column;gap:7px}
+.act .price{display:flex;align-items:baseline;justify-content:space-between;gap:10px;font-size:11.5px;color:var(--ink-3)}
+.act .price b{font-family:"IBM Plex Mono",monospace;font-size:17px;font-weight:600;color:var(--ink)}
+.subtag{margin-top:12px;background:var(--free-soft);border:1px solid var(--free);border-radius:4px;
+  padding:9px 11px;font-size:12.5px;display:flex;align-items:center;gap:10px;color:var(--ink-2)}
+.subtag span{flex:1}
+.subtag b{font-family:"IBM Plex Mono",monospace;color:var(--ink)}
+.subtag button{border:1px solid var(--free-line);background:transparent;border-radius:3px;
+  padding:3px 8px;font-size:11.5px;cursor:pointer;flex:none;color:var(--ink-2)}
+.subtag button:hover{background:var(--surface)}
+
+/* --- dividing a booth --- */
+.splitbtn{width:100%;border:1px dashed var(--line-strong);background:transparent;border-radius:4px;
+  padding:11px 12px;cursor:pointer;font-size:12px;color:var(--ink-3);text-align:left;line-height:1.45}
+.splitbtn:hover{border-color:var(--free);color:var(--ink-2)}
+.splitbtn b{display:block;font-family:Archivo,sans-serif;font-size:13.5px;color:var(--ink);font-weight:600;margin-bottom:2px}
+.ktabs{display:flex;gap:2px;background:var(--surface-2);padding:2px;border-radius:4px;margin-bottom:11px}
+.ktabs button{flex:1;border:0;background:transparent;padding:6px 10px;border-radius:3px;cursor:pointer;
+  font-size:12.5px;color:var(--ink-2)}
+.ktabs button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.ktabs button:disabled{opacity:.4;cursor:not-allowed}
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.card{border:1px solid var(--line);border-radius:4px;padding:9px 9px 7px;background:var(--surface);
+  display:flex;flex-direction:column;gap:6px}
+.card .cap{font-size:10.5px;color:var(--ink-3);font-family:"IBM Plex Mono",monospace;letter-spacing:.02em}
+.card svg{width:100%;max-height:132px;display:block;overflow:visible}
+.pc{fill:var(--free-soft);stroke:var(--free-line);stroke-width:.7;cursor:pointer}
+.pc:hover{fill:#9ED070}
+.pc.on{fill:var(--free);stroke:var(--ink);stroke-width:1.4}
+.pc.no{fill:var(--surface-2);stroke:var(--line-strong);cursor:not-allowed}
+.pl{font-family:"IBM Plex Mono",monospace;text-anchor:middle;pointer-events:none;fill:var(--ink-2)}
+.pl.on{fill:var(--free-ink)}
+.pl.no{fill:var(--ink-3)}
+.rules{font-size:11.5px;color:var(--ink-3);margin:11px 0 0;line-height:1.45}
+.back{border:0;background:transparent;color:var(--deep);font-size:12.5px;cursor:pointer;padding:6px 0 0;text-align:left}
+.step{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3)}
+.blabel.nm2{font-weight:400}
+
 @media (max-width:1100px){
   .app{height:auto;overflow:visible}
   .main{grid-template-columns:1fr;grid-template-rows:auto 62vh auto;overflow:visible}
@@ -199,7 +238,7 @@ a.mail{display:inline-block;margin-top:10px;color:var(--deep);font-size:13px}
 <form name="booth-request" data-netlify="true" netlify-honeypot="bot-field" hidden>
   <input type="hidden" name="form-name" value="booth-request">
   <input name="bot-field"><input name="hall"><input name="booth"><input name="area">
-  <input name="opensides"><input name="package"><input name="estimate">
+  <input name="opensides"><input name="package"><input name="estimate"><input name="subdivision">
   <input name="fname"><input name="lname"><input name="company"><input name="country">
   <input type="email" name="email"><input name="phone"><textarea name="message"></textarea>
 </form>
@@ -216,7 +255,7 @@ a.mail{display:inline-block;margin-top:10px;color:var(--deep);font-size:13px}
     <button id="h6" aria-pressed="false">Hall 6</button>
   </div>
   <div class="spacer"></div>
-  <div class="contact">Questions? <a href="mailto:egriboz@wastelessevent.com">egriboz@wastelessevent.com</a></div>
+  <div class="contact">Questions? <a id="contactLink" href="#">&nbsp;</a></div>
 </header>
 
 <div class="notice">
@@ -665,7 +704,7 @@ const RAW = { "Hall 5": `5H02|136|4|1|SAERTEX GMBH|R|199.5,-170.6,8.5,16
 6M15|112|4|1|BIESTERFELD SPEZIALCHEMIE GMBH|R|541.8,-386.9,14,8
 6M23|88|3|1|BODO MOELLER CHEMIE|R|547.8,-399.9,8,11
 6N32|54|3|1|AEROPREG KOMPOZIT A.S.|R|572.3,-414.9,6,9
-6P32|72|4|0||R|580.8,-417.9,6,12
+6P32|72|4|2|USA PAVILION|R|580.8,-417.9,6,12
 6D31|71.5|3|1|VIK-COMPOSITE GMBH|R|468.3,-416.9,6.5,11
 6C32|55|3|1|MENZOLIT|R|463.3,-416.9,5,11
 6C31|66|3|1|ECE BOYA|R|454.8,-416.9,6,11
@@ -691,7 +730,7 @@ const RAW = { "Hall 5": `5H02|136|4|1|SAERTEX GMBH|R|199.5,-170.6,8.5,16
 6P24|72|4|1|COMPOSITES UNITED E.V.|R|580.8,-399.9,6,12
 6Q24|72|4|1|COMPOSITES UNITED E.V.|R|589.3,-399.9,6,12
 6R24|96|4|1|COMPOSITES UNITED E.V.|R|599.3,-399.9,8,12
-6Q32|72|4|0||R|589.3,-417.9,6,12
+6Q32|72|4|2|USA PAVILION|R|589.3,-417.9,6,12
 6K24|66|3|1|ALBANY ENGINEERED COMPOSITES|R|541.8,-399.9,6,11
 6K23|77|4|1|HUNTSMAN ADVANCED MATERIALS|R|532.8,-399.9,7,11
 6M31|154|4|1|ISOVOLTA AG|R|541.8,-416.9,14,11
@@ -712,8 +751,8 @@ const RAW = { "Hall 5": `5H02|136|4|1|SAERTEX GMBH|R|199.5,-170.6,8.5,16
 6T42|72|4|2|GYEONGNAM PAVILION|R|615.3,-432.4,6,12
 6S42|36|3|0||R|607.3,-426.4,6,6
 6R42|72|4|1|AGENCE WALLONNE A L'EXPORTATION ET AUX INVES|R|599.3,-432.4,6,12
-6Q42|72|4|0||R|589.3,-432.4,6,12
-6P42|72|4|0||R|580.8,-432.4,6,12
+6Q42|72|4|2|USA PAVILION|R|589.3,-432.4,6,12
+6P42|72|4|2|USA PAVILION|R|580.8,-432.4,6,12
 6N42|19.5|2|1|4A MANUFACTURING GMBH|R|572.3,-427.4,3,6.5
 6M38|28|4|1|CARBON CLEANUP|R|561.8,-418.9,8,3.5
 6M42|92|4|1|SWANCOR|R|561.8,-432.4,8,11.5
@@ -725,8 +764,8 @@ const RAW = { "Hall 5": `5H02|136|4|1|SAERTEX GMBH|R|199.5,-170.6,8.5,16
 6M49|175|4|1|WELLS ADVANCED|R|541.8,-444.4,14,12.5
 6M52|80|4|1|SHANGHAI ZEN3 INTERNATIONAL EXHIBITIONS CO L|R|561.8,-444.4,8,10
 6N52|24|3|1|SCIGRIP|R|572.3,-438.4,6,4
-6P52|60|4|0||R|580.8,-444.4,6,10
-6Q52|60|4|0||R|589.3,-444.4,6,10
+6P52|60|4|2|USA PAVILION|R|580.8,-444.4,6,10
+6Q52|60|4|2|USA PAVILION|R|589.3,-444.4,6,10
 6R52|60|4|0||R|599.3,-444.4,6,10
 6S52|60|4|0||R|607.3,-444.4,6,10
 6T52|42|3|2|CZECH PAVILION|R|615.3,-441.4,6,7
@@ -1164,7 +1203,7 @@ const euro=n=>n.toLocaleString("en-GB",{minimumFractionDigits:2,maximumFractionD
 const euro0=n=>n.toLocaleString("en-GB",{maximumFractionDigits:0})+" €";
 
 /* ===================== state ===================== */
-const S={hall:"Hall 5", sel:null, equip:"raw", french:false,
+const S={hall:"Hall 5", sel:null, equip:"raw", french:false, sub:null, split:null,
          filters:{q:"",amin:null,amax:null,os:0}};
 
 /* ===================== plan ===================== */
@@ -1255,18 +1294,33 @@ function drawPlan(){
     const A=labelAnchor(b.pts.map(p=>[SX(p),SY(p)]));
     const cx=A.x, cy=A.y, w=A.w, h=A.h;
     if(w>4.2 && h>2.6 && A.r>1.15){
-      const two = b.st===0 && h>5 && A.r>2.1;
+      const fs=Math.min(1.5, Math.max(0.85, Math.min(w/7, A.r*1.15)));
+      const two = b.st===0 ? (h>5 && A.r>2.1)
+                : b.st===1 ? (!!b.name && h>3.6 && A.r>1.55) : false;
       const t=document.createElementNS(NS,"text");
       t.setAttribute("x",cx); t.setAttribute("y", two?cy-0.1:cy+0.45);
       t.setAttribute("class","blabel "+(b.st===0?"lb-free":b.st===2?"lb-pav":"lb-taken"));
-      t.setAttribute("font-size", Math.min(1.5, Math.max(0.85, Math.min(w/7, A.r*1.15))));
+      t.setAttribute("font-size", fs);
       t.textContent=b.code;
       f.appendChild(t);
-      if(two){
+      if(two && b.st===0){
         const a=document.createElementNS(NS,"text");
         a.setAttribute("x",cx); a.setAttribute("y",cy+1.5);
         a.setAttribute("class","blabel lb-free"); a.setAttribute("font-size","1.05");
         a.textContent=b.area+" m²"; f.appendChild(a);
+      }
+      /* exhibitor name on a booked booth, shortened to whatever fits inside it */
+      if(two && b.st===1){
+        const nf=Math.min(1.02, fs*0.82);
+        const avail=Math.max(w-1.1, A.r*1.6);
+        const max=Math.floor(avail/(nf*0.60));
+        if(max>=5){
+          const n=document.createElementNS(NS,"text");
+          n.setAttribute("x",cx); n.setAttribute("y",cy+fs*0.98);
+          n.setAttribute("class","blabel nm2 lb-taken"); n.setAttribute("font-size",nf);
+          n.textContent = b.name.length>max ? b.name.slice(0,max-1).trim()+"\u2026" : b.name;
+          f.appendChild(n);
+        }
       }
       if(b.st===2 && w>9 && h>4 && A.r>3){
         const n=document.createElementNS(NS,"text");
@@ -1369,8 +1423,201 @@ function renderList(){
   });
 }
 
+/* ===================== open sides, read from the geometry ===================== */
+/* Which edges of a booth face an aisle. Points just outside each edge are
+   tested against every other booth on the plan; an edge with nothing behind it
+   is open. Checked against the open-side count published in the plan data:
+   763 of 773 booths agree, so this is safe to divide a booth by. */
+const bboxOf = pts => {
+  const xs=pts.map(p=>p[0]), ys=pts.map(p=>p[1]);
+  return [Math.min(...xs),Math.min(...ys),Math.max(...xs),Math.max(...ys)];
+};
+function edgeOpen(b){
+  if(b._eo) return b._eo;
+  const list=HALLS[S.hall], pts=b.pts, n=pts.length, out=[];
+  for(let i=0;i<n;i++){
+    const a=pts[i], c=pts[(i+1)%n];
+    const dx=c[0]-a[0], dy=c[1]-a[1], L=Math.hypot(dx,dy);
+    if(L<0.3){ out.push(false); continue; }
+    let nx=dy/L, ny=-dx/L;
+    const mx=(a[0]+c[0])/2, my=(a[1]+c[1])/2;
+    if(pip([mx+nx*0.05,my+ny*0.05],pts)){ nx=-nx; ny=-ny; }
+    let free=0;
+    for(const t of [0.2,0.5,0.8]){
+      const px=a[0]+dx*t+nx*0.6, py=a[1]+dy*t+ny*0.6;
+      let hit=false;
+      for(const o of list){
+        if(o===b) continue;
+        const bb=o._bb||(o._bb=bboxOf(o.pts));
+        if(px<bb[0]-0.1||px>bb[2]+0.1||py<bb[1]-0.1||py>bb[3]+0.1) continue;
+        if(pip([px,py],o.pts)){ hit=true; break; }
+      }
+      if(!hit) free++;
+    }
+    out.push(free>=2);
+  }
+  return (b._eo=out);
+}
+
+/* ===================== dividing a booth ===================== */
+const MIN_SIDE=3, GRID=0.5;
+const r1=n=>Math.round(n*10)/10;
+const r2=n=>Math.round(n*100)/100;
+const fmtM=n=>Number.isInteger(n)?String(n):n.toFixed(1);
+
+function rectOf(b){
+  if(b.pts.length!==4) return null;
+  const xs=b.pts.map(p=>p[0]), ys=b.pts.map(p=>p[1]);
+  if(new Set(xs.map(r1)).size!==2 || new Set(ys.map(r1)).size!==2) return null;
+  const x0=Math.min(...xs), x1=Math.max(...xs), y0=Math.min(...ys), y1=Math.max(...ys);
+  return {x0,y0,x1,y1,w:r1(x1-x0),h:r1(y1-y0)};
+}
+/* which of the four faces of a rectangular booth are open */
+function faces(b){
+  const R=rectOf(b); if(!R) return null;
+  const E=edgeOpen(b), f={minX:false,maxX:false,minY:false,maxY:false};
+  b.pts.forEach((p,i)=>{
+    if(!E[i]) return;
+    const q=b.pts[(i+1)%4];
+    if(Math.abs(p[0]-q[0])<0.06)      f[Math.abs(p[0]-R.x0)<0.06?"minX":"maxX"]=true;
+    else if(Math.abs(p[1]-q[1])<0.06) f[Math.abs(p[1]-R.y0)<0.06?"minY":"maxY"]=true;
+  });
+  return {R,f};
+}
+/* every way of cutting a run of L metres into k parts on a half-metre grid,
+   no part shorter than 3 m */
+function cutRuns(L,k){
+  const steps=Math.round(L/GRID), mn=Math.round(MIN_SIDE/GRID), out=[];
+  if(Math.abs(steps*GRID-L)>0.02) return out;
+  const rec=(rem,left,acc)=>{
+    if(left===1){ if(rem>=mn) out.push([...acc,rem]); return; }
+    for(let s=mn;s<=rem-mn*(left-1);s++) rec(rem-s,left-1,[...acc,s]);
+  };
+  rec(steps,k,[]);
+  return out.map(a=>a.map(s=>r1(s*GRID)));
+}
+function piecesOf(b,s){
+  const F=faces(b); if(!F) return [];
+  const {R,f}=F, out=[]; let run=0;
+  s.parts.forEach((len,i)=>{
+    const last = i===s.parts.length-1;
+    const w = s.axis==="x"?len:R.w, h = s.axis==="x"?R.h:len;
+    const open = s.axis==="x"
+      ? (i===0&&f.minX?1:0)+(last&&f.maxX?1:0)+(f.minY?1:0)+(f.maxY?1:0)
+      : (i===0&&f.minY?1:0)+(last&&f.maxY?1:0)+(f.minX?1:0)+(f.maxX?1:0);
+    out.push({i,w,h,open,area:r2(w*h),
+      ok: open>=2 && w>=MIN_SIDE-0.01 && h>=MIN_SIDE-0.01,
+      x: s.axis==="x"?run:0, y: s.axis==="x"?0:run,
+      dx: s.axis==="x"?len:R.w, dy: s.axis==="x"?R.h:len});
+    run+=len;
+  });
+  return out;
+}
+/* a handful of sensible ways to divide this booth into k parts */
+function schemesOf(b,k){
+  if(b.st!==0) return [];
+  const F=faces(b); if(!F) return [];
+  const {R}=F, all=[];
+  for(const axis of ["x","y"]){
+    const L = axis==="x"?R.w:R.h, other = axis==="x"?R.h:R.w;
+    if(other<MIN_SIDE-0.01) continue;
+    for(const parts of cutRuns(L,k)){
+      const spread=Math.max(...parts)-Math.min(...parts);
+      const halves=parts.filter(p=>Math.abs(p-Math.round(p))>0.01).length;
+      all.push({axis,parts,
+        score:(spread===0?0:1.5+spread*0.4)+halves*0.35+(L<other-0.01?3:0)});
+    }
+  }
+  if(!all.length) return [];
+  for(const s of all){
+    s.pieces=piecesOf(b,s);
+    /* two layouts that are mirror images of each other offer the same stands */
+    s.key=s.axis+"|"+s.pieces.map(p=>p.area+":"+p.open+":"+(p.ok?1:0)).sort().join(",");
+  }
+  all.sort((a,c)=>a.score-c.score);
+  const seen=new Set(), pick=[];
+  for(const s of all){
+    if(seen.has(s.key) || !s.pieces.some(p=>p.ok)) continue;
+    seen.add(s.key); pick.push(s);
+    if(pick.length>=4) break;
+  }
+  /* always keep the smallest stand this booth can yield on the menu */
+  const small=all.find(s=>Math.abs(Math.min(...s.parts)-MIN_SIDE)<0.01 && s.pieces.some(p=>p.ok));
+  if(small && !seen.has(small.key)){ if(pick.length>=4) pick.pop(); pick.push(small); }
+  return pick;
+}
+function schemeCaption(b,s){
+  const along = s.axis==="x" ? "across" : "down";
+  return s.parts.map(fmtM).join(" + ")+" m "+along;
+}
+function schemeCard(base,s,si){
+  const R=rectOf(base), K=100/Math.max(R.w,R.h);
+  const card=el("div","card");
+  card.append(el("div","cap",schemeCaption(base,s)));
+  const g=document.createElementNS(NS,"svg");
+  g.setAttribute("viewBox",`-1.5 -1.5 ${R.w*K+3} ${R.h*K+3}`);
+  g.setAttribute("role","group");
+  s.pieces.forEach(p=>{
+    const on = S.sub && S.sub.parent===base.code && S.sub.k===s.parts.length &&
+               S.sub.si===si && S.sub.i===p.i;
+    const r=document.createElementNS(NS,"rect");
+    r.setAttribute("x",p.x*K); r.setAttribute("y",p.y*K);
+    r.setAttribute("width",p.dx*K); r.setAttribute("height",p.dy*K);
+    r.setAttribute("class","pc"+(p.ok?(on?" on":""):" no"));
+    if(p.ok){
+      r.setAttribute("tabindex","0"); r.setAttribute("role","button");
+      r.setAttribute("aria-label",`${fmtM(p.w)} by ${fmtM(p.h)} metres, ${p.area} square metres, ${p.open} open sides`);
+      const take=()=>pickPiece(base,s,si,p);
+      r.addEventListener("click",take);
+      r.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){e.preventDefault();take();} });
+    }else{
+      const t=document.createElementNS(NS,"title");
+      t.textContent = p.open<2 ? "Only "+p.open+" open side — not offered" : "Side shorter than 3 m";
+      r.appendChild(t);
+    }
+    g.appendChild(r);
+    const fs=Math.max(4.6,Math.min(7,Math.min(p.dx*K/5.2,p.dy*K/2.6)));
+    const cx=(p.x+p.dx/2)*K, cy=(p.y+p.dy/2)*K;
+    const two=p.dy*K>fs*3;
+    const l1=document.createElementNS(NS,"text");
+    l1.setAttribute("x",cx); l1.setAttribute("y",two?cy-fs*0.15:cy+fs*0.36);
+    l1.setAttribute("font-size",fs);
+    l1.setAttribute("class","pl"+(p.ok?(on?" on":""):" no"));
+    l1.textContent=`${fmtM(p.w)}×${fmtM(p.h)}`;
+    g.appendChild(l1);
+    if(two){
+      const l2=document.createElementNS(NS,"text");
+      l2.setAttribute("x",cx); l2.setAttribute("y",cy+fs*1.05);
+      l2.setAttribute("font-size",fs*0.92);
+      l2.setAttribute("class","pl"+(p.ok?(on?" on":""):" no"));
+      l2.textContent=p.area+" m²";
+      g.appendChild(l2);
+    }
+  });
+  card.append(g);
+  return card;
+}
+function pickPiece(base,s,si,p){
+  S.sub={parent:base.code, k:s.parts.length, si, i:p.i, axis:s.axis, parts:s.parts,
+         w:p.w, h:p.h, area:p.area, open:p.open};
+  const b=curBooth();
+  if(!eligible(b,EQUIP.find(e=>e.id===S.equip))) S.equip="raw";
+  renderDetail();
+}
+
 /* ===================== detail ===================== */
 const el=(tag,cls,txt)=>{const e=document.createElement(tag); if(cls)e.className=cls; if(txt!=null)e.textContent=txt; return e;};
+
+/* the booth the price and the request refer to: the real one, or the part of
+   it the visitor picked */
+function curBooth(){
+  const b=HALLS[S.hall].find(x=>x.code===S.sel);
+  if(!b) return null;
+  if(S.sub && S.sub.parent===b.code)
+    return {...b, area:S.sub.area, open:S.sub.open, sub:S.sub};
+  return b;
+}
+const subLabel = sub => `${fmtM(sub.w)} × ${fmtM(sub.h)} m part of ${sub.parent} (booth divided in ${sub.k})`;
 
 function renderDetail(){
   const host=document.getElementById("detail"); host.textContent="";
@@ -1380,15 +1627,78 @@ function renderDetail(){
     w.append(el("p",null,"Click any green booth on the plan, or choose one from the list, to see what it costs with each stand package. Red booths are already booked and orange areas are dedicated show zones — neither can be requested."));
     host.appendChild(w); return;
   }
-  const b=HALLS[S.hall].find(x=>x.code===S.sel);
+  const base=HALLS[S.hall].find(x=>x.code===S.sel);
+  const b=curBooth();
+  if(!eligible(b,EQUIP.find(e=>e.id===S.equip))) S.equip="raw";
+  const q=quote(b,S.equip,S.french);
 
+  /* ---- head: number, size, price and the request button ---- */
   const head=el("div","dhead");
   head.append(el("div","eyebrow",S.hall+" · Available"));
-  head.append(el("div","code",b.code));
+  head.append(el("div","code",base.code));
+
+  if(S.sub){
+    const tag=el("div","subtag");
+    const sp=el("span");
+    sp.append(document.createTextNode("Requesting a "));
+    sp.append(el("b",null,`${fmtM(S.sub.w)} × ${fmtM(S.sub.h)} m`));
+    sp.append(document.createTextNode(` part of this booth — ${b.area} m², ${b.open} open sides.`));
+    const rst=el("button",null,"Whole booth");
+    rst.onclick=()=>{ S.sub=null;
+      const w=curBooth();
+      if(!eligible(w,EQUIP.find(e=>e.id===S.equip))) S.equip="raw";
+      renderDetail(); };
+    tag.append(sp,rst); head.append(tag);
+  }
+
   const facts=el("dl","facts");
   [["Surface",b.area+" m²"],["Open sides",String(b.open)],["Surcharge",(surcharge(b.open)*100).toFixed(0)+"%"]]
     .forEach(([k,v])=>{const d=el("div"); d.append(el("dt",null,k),el("dd",null,v)); facts.append(d);});
-  head.append(facts); host.append(head);
+  head.append(facts);
+
+  const act=el("div","act");
+  const cta=el("button","cta","Request to book this booth");
+  cta.onclick=()=>openRequest();
+  const pr=el("div","price");
+  pr.append(Object.assign(el("span"),{textContent:q.eq.name+" · estimate"}));
+  pr.append(el("b",null,euro0(q.total)+(S.french?" incl. VAT":" excl. VAT")));
+  act.append(cta,pr); head.append(act);
+  host.append(head);
+
+  /* ---- a smaller stand in the same place ---- */
+  const sch={2:schemesOf(base,2), 3:schemesOf(base,3)};
+  if(sch[2].length||sch[3].length){
+    const R=rectOf(base);
+    const s0=el("section","sect");
+    s0.append(el("h4",null,"Want a smaller stand here?"));
+    if(!S.split){
+      const btn=el("button","splitbtn");
+      btn.append(el("b",null,"Divide this booth"));
+      btn.append(document.createTextNode(
+        `${base.code} is ${fmtM(R.w)} × ${fmtM(R.h)} m. It can be split into two or three smaller stands — see the layouts and pick the part you want.`));
+      btn.onclick=()=>{ S.split = sch[2].length?2:3; renderDetail(); };
+      s0.append(btn);
+    }else{
+      const tabs=el("div","ktabs");
+      [[2,"Split in 2"],[3,"Split in 3"]].forEach(([k,lab])=>{
+        const t=el("button",null,lab);
+        t.setAttribute("aria-pressed",String(S.split===k));
+        t.disabled=!sch[k].length;
+        t.onclick=()=>{S.split=k;renderDetail();};
+        tabs.append(t);
+      });
+      s0.append(tabs);
+      const cards=el("div","cards");
+      sch[S.split].forEach((s,si)=>cards.append(schemeCard(base,s,si)));
+      s0.append(cards);
+      s0.append(Object.assign(el("p","rules"),{textContent:
+        "Click the part you want. Every stand keeps at least two open sides, no side is shorter than 3 m, and lengths are cut in whole or half metres — grey parts break one of those rules. A division is a request; JEC confirms the final layout."}));
+      const hide=el("button","back","Hide these layouts");
+      hide.onclick=()=>{S.split=null;renderDetail();};
+      s0.append(hide);
+    }
+    host.append(s0);
+  }
 
   const tg=el("div","toggles");
   tg.append(toggle("French exhibitor – add 20% VAT",S.french,v=>{S.french=v;renderDetail();}));
@@ -1396,26 +1706,10 @@ function renderDetail(){
 
   const s1=el("section","sect"); s1.append(el("h4",null,"Stand package"));
   const opts=el("div","opts");
-  const priced=EQUIP.map(e=>({e,ok:eligible(b,e),q:quote(b,e.id,S.french)}))
-                    .sort((a,x)=>a.q.total-x.q.total);
-  priced.forEach(({e,ok,q})=>{
-    const btn=el("button","opt");
-    btn.setAttribute("aria-pressed",String(S.equip===e.id&&ok));
-    btn.disabled=!ok;
-    btn.append(el("div","nm",e.name));
-    btn.append(el("div","rate", e.rate===0
-      ? euro0(RAW_RATE)+"/m² space only"
-      : euro0(RAW_RATE)+" + "+euro0(e.rate)+"/m²"));
-    btn.append(el("div","tot", ok?euro0(q.total):"—"));
-    if(!ok) btn.append(el("div","why", e.max<Infinity?`Only for ${e.min}–${e.max} m² booths`:`Minimum ${e.min} m²`));
-    if(ok) btn.onclick=()=>{S.equip=e.id;renderDetail();};
-    opts.append(btn);
-  });
+  EQUIP.map(e=>({e,ok:eligible(b,e),q:quote(b,e.id,S.french)}))
+       .sort((a,x)=>a.q.total-x.q.total)
+       .forEach(({e,ok,q:qq})=>opts.append(packageButton(e,ok,qq,()=>{S.equip=e.id;renderDetail();})));
   s1.append(opts); host.append(s1);
-
-  const cur=EQUIP.find(e=>e.id===S.equip);
-  if(!eligible(b,cur)) S.equip="raw";
-  const q=quote(b,S.equip,S.french);
 
   /* what you get */
   const s2=el("section","sect");
@@ -1457,11 +1751,21 @@ function renderDetail(){
   tb.append(tr); t.append(tb); s3.append(t); host.append(s3);
 
   const s4=el("section","sect");
-  const cta=el("button","cta","Request to book this booth");
-  cta.onclick=()=>openForm(b,q);
-  s4.append(cta);
   s4.append(Object.assign(el("p","note"),{textContent:"Prototype — prices follow the JEC World 2027 published booth-cost model. Sending a request does not reserve the booth; a JEC sales contact confirms availability."}));
   host.append(s4);
+}
+function packageButton(e,ok,q,on){
+  const btn=el("button","opt");
+  btn.setAttribute("aria-pressed",String(S.equip===e.id&&ok));
+  btn.disabled=!ok;
+  btn.append(el("div","nm",e.name));
+  btn.append(el("div","rate", e.rate===0
+    ? euro0(RAW_RATE)+"/m² space only"
+    : euro0(RAW_RATE)+" + "+euro0(e.rate)+"/m²"));
+  btn.append(el("div","tot", ok?euro0(q.total):"—"));
+  if(!ok) btn.append(el("div","why", e.max<Infinity?`Only for ${e.min}–${e.max} m² booths`:`Minimum ${e.min} m²`));
+  if(ok) btn.onclick=on;
+  return btn;
 }
 function toggle(label,val,on){
   const l=el("label","tog");
@@ -1481,81 +1785,135 @@ function lightbox(src,alt){
   host.textContent=""; host.append(scrim);
 }
 
-/* ===================== booking form ===================== */
-function openForm(b,q){
+/* ===================== booking request: package, then form ===================== */
+function openRequest(){
   const host=document.getElementById("modalHost"); host.textContent="";
   const scrim=el("div","scrim"), modal=el("div","modal");
-  modal.setAttribute("role","dialog"); modal.setAttribute("aria-modal","true"); modal.setAttribute("aria-label","Booking request");
+  modal.setAttribute("role","dialog"); modal.setAttribute("aria-modal","true");
+  modal.setAttribute("aria-label","Booking request");
   const mh=el("div","mh"), ttl=el("div");
-  ttl.append(el("div","eyebrow","Booking request"));
-  ttl.append(el("h3",null,`Booth ${b.code} · ${q.eq.name}`));
+  const eyebrow=el("div","step"), title=el("h3");
+  ttl.append(eyebrow,title);
   const x=el("button","x","×"); x.setAttribute("aria-label","Close"); x.onclick=close;
   mh.append(ttl,x); modal.append(mh);
-
-  const body=el("div","mb");
-  const sum=el("div","summary");
-  [[S.hall+" — booth ",b.code],["Surface ",b.area+" m², "+b.open+" open sides"],
-   ["Package ",q.eq.name],
-   ["Estimate ",euro(q.total)+(S.french?" incl. VAT":" excl. VAT")]]
-   .forEach(([k,v])=>{const d=el("div"); d.append(document.createTextNode(k)); d.append(el("b",null,v)); sum.append(d);});
-  body.append(sum);
-
-  const f=document.createElement("form");
-  f.style.cssText="display:flex;flex-direction:column;gap:12px";
-  const hp=document.createElement("input");
-  hp.type="text"; hp.name="bot-field"; hp.tabIndex=-1; hp.autocomplete="off";
-  hp.style.cssText="position:absolute;left:-9999px;width:1px;height:1px;opacity:0";
-  const g1=el("div","grid2"); g1.append(field("First name","fname","text",true),field("Last name","lname","text",true));
-  const g2=el("div","grid2"); g2.append(field("Company","company","text",true),field("Country","country","text",false));
-  const g3=el("div","grid2"); g3.append(field("Work email","email","email",true),field("Phone","phone","text",false));
-  f.append(hp,g1,g2,g3);
-  const msg=el("label","f"); msg.append(document.createTextNode("Message (optional)"));
-  const ta=document.createElement("textarea"); ta.name="message";
-  ta.placeholder="Anything we should know — preferred alternative booths, timing, questions.";
-  msg.append(ta); f.append(msg);
-  const send=el("button","cta","Send request"); send.type="submit"; f.append(send);
-
-  f.onsubmit=async ev=>{
-    ev.preventDefault();
-    const d=Object.fromEntries(new FormData(f).entries());
-    const lines=[`Booth request — JEC World 2027`,`Hall: ${S.hall}`,
-      `Booth: ${b.code} (${b.area} m², ${b.open} open sides)`,`Package: ${q.eq.name}`,
-      `Estimate: ${euro(q.total)} ${S.french?"incl. VAT":"excl. VAT"}`,``,
-      `Name: ${d.fname} ${d.lname}`,`Company: ${d.company}`,`Country: ${d.country||"—"}`,
-      `Email: ${d.email}`,`Phone: ${d.phone||"—"}`,``,`Message: ${d.message||"—"}`].join("\n");
-    send.disabled=true; send.textContent="Sending…";
-    const payload={"form-name":"booth-request",hall:S.hall,booth:b.code,area:b.area+" m2",
-      opensides:String(b.open),package:q.eq.name,
-      estimate:euro(q.total)+(S.french?" incl. VAT":" excl. VAT"),...d};
-    let sent=false;
-    try{
-      const r=await fetch("/",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},
-        body:new URLSearchParams(payload).toString()});
-      sent=r.ok;
-    }catch(e){ sent=false; }
-    body.textContent="";
-    const ok=el("div","ok");
-    ok.append(el("div","tick","✓"));
-    ok.append(el("h3",null,sent?"Request sent":"Request ready"));
-    ok.append(Object.assign(el("p","note"),{textContent: sent
-      ? "Thank you — our team will confirm availability for this booth by email."
-      : "This preview cannot transmit the form. Here is the exact message the live site sends."}));
-    body.append(ok);
-    if(!sent){
-      const pre=document.createElement("pre");
-      pre.style.cssText="background:var(--surface-2);padding:12px;border-radius:4px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;white-space:pre-wrap;overflow-x:auto;margin:0";
-      pre.textContent=lines; body.append(pre);
-      const a=el("a","mail","Open this in your mail client →");
-      a.href=`mailto:${CONTACT}?subject=${encodeURIComponent("Booth request "+b.code+" — JEC World 2027")}&body=${encodeURIComponent(lines)}`;
-      body.append(a);
-    }
-  };
-  body.append(f); modal.append(body); scrim.append(modal);
+  const body=el("div","mb"); modal.append(body);
+  scrim.append(modal);
   scrim.addEventListener("click",e=>{if(e.target===scrim)close();});
   host.append(scrim); document.addEventListener("keydown",esc);
-  modal.querySelector("input[name=fname]").focus();
+
+  let pick=S.equip;
+  step1();
+
+  function b(){ return curBooth(); }
   function close(){host.textContent="";document.removeEventListener("keydown",esc);}
   function esc(e){if(e.key==="Escape")close();}
+
+  function summary(q){
+    const sum=el("div","summary");
+    const rows=[[S.hall+" — booth ",b().code],
+                ["Surface ",b().area+" m², "+b().open+" open sides"]];
+    if(S.sub) rows.push(["Layout ",subLabel(S.sub)]);
+    rows.push(["Package ",q.eq.name],
+              ["Estimate ",euro(q.total)+(S.french?" incl. VAT":" excl. VAT")]);
+    rows.forEach(([k,v])=>{const d=el("div"); d.append(document.createTextNode(k)); d.append(el("b",null,v)); sum.append(d);});
+    return sum;
+  }
+
+  function step1(){
+    const cur=b();
+    if(!eligible(cur,EQUIP.find(e=>e.id===pick))) pick="raw";
+    eyebrow.textContent="Step 1 of 2";
+    title.textContent="Please select booth type";
+    body.textContent="";
+    body.append(Object.assign(el("p","note"),{textContent:
+      "Raw space is the floor only — you build the stand. The equipped packages are turnkey: walls, carpet, furniture, power and cleaning are included."}));
+    const opts=el("div","opts");
+    EQUIP.map(e=>({e,ok:eligible(cur,e),q:quote(cur,e.id,S.french)}))
+         .sort((a,c)=>a.q.total-c.q.total)
+         .forEach(({e,ok,q})=>{
+      const btn=el("button","opt");
+      btn.setAttribute("aria-pressed",String(pick===e.id&&ok));
+      btn.disabled=!ok;
+      btn.append(el("div","nm",e.name));
+      btn.append(el("div","rate", e.rate===0
+        ? euro0(RAW_RATE)+"/m² space only"
+        : euro0(RAW_RATE)+" + "+euro0(e.rate)+"/m²"));
+      btn.append(el("div","tot", ok?euro0(q.total):"—"));
+      if(!ok) btn.append(el("div","why", e.max<Infinity?`Only for ${e.min}–${e.max} m² booths`:`Minimum ${e.min} m²`));
+      if(ok) btn.onclick=()=>{ pick=e.id; S.equip=e.id; renderDetail(); step1(); };
+      opts.append(btn);
+    });
+    body.append(opts);
+    const go=el("button","cta","Continue to the request form →");
+    go.onclick=step2;
+    body.append(go);
+  }
+
+  function step2(){
+    const cur=b(), q=quote(cur,pick,S.french);
+    eyebrow.textContent="Step 2 of 2";
+    title.textContent=`Booth ${cur.code} · ${q.eq.name}`;
+    body.textContent="";
+    const back=el("button","back","← Change booth type");
+    back.onclick=step1;
+    body.append(back, summary(q));
+
+    const f=document.createElement("form");
+    f.style.cssText="display:flex;flex-direction:column;gap:12px";
+    const hp=document.createElement("input");
+    hp.type="text"; hp.name="bot-field"; hp.tabIndex=-1; hp.autocomplete="off";
+    hp.style.cssText="position:absolute;left:-9999px;width:1px;height:1px;opacity:0";
+    const g1=el("div","grid2"); g1.append(field("First name","fname","text",true),field("Last name","lname","text",true));
+    const g2=el("div","grid2"); g2.append(field("Company","company","text",true),field("Country","country","text",false));
+    const g3=el("div","grid2"); g3.append(field("Work email","email","email",true),field("Phone","phone","text",false));
+    f.append(hp,g1,g2,g3);
+    const msg=el("label","f"); msg.append(document.createTextNode("Message (optional)"));
+    const ta=document.createElement("textarea"); ta.name="message";
+    ta.placeholder="Anything we should know — preferred alternative booths, timing, questions.";
+    msg.append(ta); f.append(msg);
+    const send=el("button","cta","Send request"); send.type="submit"; f.append(send);
+
+    f.onsubmit=async ev=>{
+      ev.preventDefault();
+      const d=Object.fromEntries(new FormData(f).entries());
+      const sub = S.sub ? subLabel(S.sub) : "no — the whole booth";
+      const lines=[`Booth request — JEC World 2027`,`Hall: ${S.hall}`,
+        `Booth: ${cur.code} (${cur.area} m², ${cur.open} open sides)`,
+        `Divided: ${sub}`,
+        `Package: ${q.eq.name}`,
+        `Estimate: ${euro(q.total)} ${S.french?"incl. VAT":"excl. VAT"}`,``,
+        `Name: ${d.fname} ${d.lname}`,`Company: ${d.company}`,`Country: ${d.country||"—"}`,
+        `Email: ${d.email}`,`Phone: ${d.phone||"—"}`,``,`Message: ${d.message||"—"}`].join("\n");
+      send.disabled=true; send.textContent="Sending…";
+      const payload={"form-name":"booth-request",hall:S.hall,booth:cur.code,area:cur.area+" m2",
+        opensides:String(cur.open),package:q.eq.name,subdivision:sub,
+        estimate:euro(q.total)+(S.french?" incl. VAT":" excl. VAT"),...d};
+      let sent=false;
+      try{
+        const r=await fetch("/",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},
+          body:new URLSearchParams(payload).toString()});
+        sent=r.ok;
+      }catch(e){ sent=false; }
+      body.textContent="";
+      const ok=el("div","ok");
+      ok.append(el("div","tick","✓"));
+      ok.append(el("h3",null,sent?"Request sent":"Request ready"));
+      ok.append(Object.assign(el("p","note"),{textContent: sent
+        ? "Thank you — our team will confirm availability for this booth by email."
+        : "This preview cannot transmit the form. Here is the exact message the live site sends."}));
+      body.append(ok);
+      if(!sent){
+        const pre=document.createElement("pre");
+        pre.style.cssText="background:var(--surface-2);padding:12px;border-radius:4px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;white-space:pre-wrap;overflow-x:auto;margin:0";
+        pre.textContent=lines; body.append(pre);
+        const a=el("a","mail","Open this in your mail client →");
+        a.href=`mailto:${CONTACT}?subject=${encodeURIComponent("Booth request "+cur.code+" — JEC World 2027")}&body=${encodeURIComponent(lines)}`;
+        body.append(a);
+      }
+    };
+    body.append(f);
+    const first=f.querySelector("input[name=fname]"); if(first) first.focus();
+  }
 }
 function field(label,name,type,required){
   const l=el("label","f"), span=document.createElement("span");
@@ -1568,14 +1926,14 @@ function field(label,name,type,required){
 
 /* ===================== wiring ===================== */
 function select(code){
-  S.sel=code;
+  S.sel=code; S.sub=null; S.split=null;
   const b=HALLS[S.hall].find(x=>x.code===code);
   vp.querySelectorAll(".b-free").forEach(p=>p.classList.toggle("sel",p.dataset.code===code));
   if(!eligible(b,EQUIP.find(e=>e.id===S.equip))) S.equip="raw";
   zoomToBooth(b); renderList(); renderDetail();
 }
 function setHall(h){
-  S.hall=h; S.sel=null;
+  S.hall=h; S.sel=null; S.sub=null; S.split=null;
   document.getElementById("h5").setAttribute("aria-pressed",String(h==="Hall 5"));
   document.getElementById("h6").setAttribute("aria-pressed",String(h==="Hall 6"));
   drawPlan(); renderList(); renderDetail();
@@ -1600,6 +1958,8 @@ function showStamp(){
 }
 
 (async function boot(){
+  const cl=document.getElementById("contactLink");
+  if(cl){ cl.textContent=CONTACT; cl.href="mailto:"+CONTACT; }
   try{
     const r = await fetch("data/booths.json", {cache:"no-store"});
     if(r.ok){
