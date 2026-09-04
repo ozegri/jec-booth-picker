@@ -1,16 +1,19 @@
 {
   "_comment": "Manual decisions re-applied on every refresh. Booth codes are exactly as they appear on the plan.",
-
   "reserved": {
     "5H01": "Reserved",
     "6J05": "Reserved",
     "6B35": "Reserved",
     "6J86": "Reserved"
   },
-
   "zones": {
+    "6P32": "USA PAVILION",
+    "6Q32": "USA PAVILION",
+    "6Q42": "USA PAVILION",
+    "6P42": "USA PAVILION",
+    "6P52": "USA PAVILION",
+    "6Q52": "USA PAVILION"
   },
-
   "zonePrefixes": {
     "6H04-": "STARTUP BOOSTER POD"
   }
