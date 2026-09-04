@@ -17,6 +17,7 @@
   --taken:#CF5548; --taken-line:#96382C; --taken-soft:#F7DFDC; --taken-ink:#FFF3F1;
   --pav:#E08A16; --pav-line:#9E5F06; --pav-soft:#FBEBD3; --pav-ink:#FFF7EC;
   --deep:#12356F; --amber:#9C6510; --focus:#12356F; --on-accent:#FFFFFF;
+  --deep-soft:#E7EDF8; --deep-line:#B9C8E4;
   --shadow:0 1px 2px rgba(19,26,22,.06),0 8px 24px rgba(19,26,22,.07);
 }
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
@@ -27,6 +28,7 @@
   --taken:#A8443A; --taken-line:#6E2A22; --taken-soft:#2E1B18; --taken-ink:#FBE9E6;
   --pav:#C4780F; --pav-line:#7E4C05; --pav-soft:#2E2412; --pav-ink:#1A1204;
   --deep:#8FB4F2; --amber:#D9A253; --focus:#8FB4F2; --on-accent:#0F1709;
+  --deep-soft:#1A2436; --deep-line:#33456A;
   --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px rgba(0,0,0,.35);
 }}
 :root[data-theme="dark"]{
@@ -37,6 +39,7 @@
   --taken:#A8443A; --taken-line:#6E2A22; --taken-soft:#2E1B18; --taken-ink:#FBE9E6;
   --pav:#C4780F; --pav-line:#7E4C05; --pav-soft:#2E2412; --pav-ink:#1A1204;
   --deep:#8FB4F2; --amber:#D9A253; --focus:#8FB4F2; --on-accent:#0F1709;
+  --deep-soft:#1A2436; --deep-line:#33456A;
   --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px rgba(0,0,0,.35);
 }
 
@@ -195,10 +198,13 @@ a.mail{display:inline-block;margin-top:10px;color:var(--deep);font-size:13px}
 .subtag button:hover{background:var(--surface)}
 
 /* --- dividing a booth --- */
-.splitbtn{width:100%;border:1px dashed var(--line-strong);background:transparent;border-radius:4px;
-  padding:11px 12px;cursor:pointer;font-size:12px;color:var(--ink-3);text-align:left;line-height:1.45}
-.splitbtn:hover{border-color:var(--free);color:var(--ink-2)}
-.splitbtn b{display:block;font-family:Archivo,sans-serif;font-size:13.5px;color:var(--ink);font-weight:600;margin-bottom:2px}
+.pitch{background:var(--deep-soft);border:1px solid var(--deep-line);border-radius:5px;padding:14px 15px}
+.pitch .ph{font-family:Archivo,sans-serif;font-weight:700;font-size:16.5px;letter-spacing:-.018em;color:var(--ink)}
+.pitch .pp{font-size:12.5px;color:var(--ink-2);margin:5px 0 12px;line-height:1.5}
+.cta2{display:block;width:100%;padding:11px;border:0;border-radius:4px;background:var(--deep);
+  color:var(--on-accent);font-family:Archivo,sans-serif;font-weight:600;font-size:14.5px;
+  cursor:pointer;letter-spacing:-.01em}
+.cta2:hover{filter:brightness(1.12)}
 .ktabs{display:flex;gap:2px;background:var(--surface-2);padding:2px;border-radius:4px;margin-bottom:11px}
 .ktabs button{flex:1;border:0;background:transparent;padding:6px 10px;border-radius:3px;cursor:pointer;
   font-size:12.5px;color:var(--ink-2)}
@@ -1163,7 +1169,7 @@ const EQUIP = [
 ];
 const RAW_RATE=513, SUSTAIN=5;
 const SURCHARGE={1:0,2:0.07,3:0.11,4:0.13};
-const CONTACT="egriboz@wastelessevent.com";
+const CONTACT="egriboz.ext@jeccomposites.com";
 
 function parseHall(txt){
   return txt.trim().split("\n").filter(Boolean).map(line=>{
@@ -1670,15 +1676,18 @@ function renderDetail(){
   if(sch[2].length||sch[3].length){
     const R=rectOf(base);
     const s0=el("section","sect");
-    s0.append(el("h4",null,"Want a smaller stand here?"));
     if(!S.split){
-      const btn=el("button","splitbtn");
-      btn.append(el("b",null,"Divide this booth"));
-      btn.append(document.createTextNode(
-        `${base.code} is ${fmtM(R.w)} × ${fmtM(R.h)} m. It can be split into two or three smaller stands — see the layouts and pick the part you want.`));
+      const box=el("div","pitch");
+      box.append(el("div","ph","Right spot, wrong size?"));
+      const smallest=Math.min(...[2,3].flatMap(k=>sch[k].flatMap(s=>s.pieces.filter(p=>p.ok).map(p=>p.area))));
+      box.append(Object.assign(el("p","pp"),{textContent:
+        `${base.code} is ${fmtM(R.w)} × ${fmtM(R.h)} m. Keep this location and take less of it — it can be divided into two or three smaller stands, down to ${smallest} m².`}));
+      const btn=el("button","cta2","Resize this booth →");
       btn.onclick=()=>{ S.split = sch[2].length?2:3; renderDetail(); };
-      s0.append(btn);
+      box.append(btn);
+      s0.append(box);
     }else{
+      s0.append(el("h4",null,"Pick your part of "+base.code));
       const tabs=el("div","ktabs");
       [[2,"Split in 2"],[3,"Split in 3"]].forEach(([k,lab])=>{
         const t=el("button",null,lab);
