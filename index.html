@@ -1099,9 +1099,10 @@ const ENTRANCES = {
 };
 
 const EQUIP = [
-  {id:"raw", name:"Raw Space", rate:0, min:0, max:Infinity, builder:"Your own stand builder",
+  {id:"raw", name:"Raw Space", rate:0, min:24, max:Infinity, builder:"Your own stand builder",
    blurb:"Bare floor space. You design and build the stand yourself, or commission a builder.",
-   incl:["Floor space only — no walls, carpet, furniture, power or cleaning",
+   incl:["From 24 m² — smaller booths are only sold as an equipped package",
+         "Floor space only — no walls, carpet, furniture, power or cleaning",
          "Floor marking of your booth location",
          "Floor signage with your booth number and a QR code to your Buyer's Guide profile",
          "You submit your own stand design for approval"]},
@@ -1618,8 +1619,10 @@ function renderDetail(){
   }
   const base=HALLS[S.hall].find(x=>x.code===S.sel);
   const b=curBooth();
-  if(!eligible(b,EQUIP.find(e=>e.id===S.equip))) S.equip="raw";
-  const q=quote(b,S.equip,S.french);
+  const fits=EQUIP.filter(e=>eligible(b,e));
+  if(!fits.some(e=>e.id===S.equip) && fits.length)
+    S.equip=fits.map(e=>({e,t:quote(b,e.id,false).total})).sort((x,y)=>x.t-y.t)[0].e.id;
+  const q=fits.length?quote(b,S.equip,S.french):null;
 
   /* ---- head: number, size, price and the request button ---- */
   const head=el("div","dhead");
@@ -1648,10 +1651,17 @@ function renderDetail(){
   const act=el("div","act");
   const cta=el("button","cta","Request to book this booth");
   cta.onclick=()=>openRequest();
-  const pr=el("div","price");
-  pr.append(Object.assign(el("span"),{textContent:q.eq.name+" · estimate"}));
-  pr.append(el("b",null,euro0(q.total)+(S.french?" incl. VAT":" excl. VAT")));
-  act.append(cta,pr); head.append(act);
+  act.append(cta);
+  if(q){
+    const pr=el("div","price");
+    pr.append(Object.assign(el("span"),{textContent:q.eq.name+" · estimate"}));
+    pr.append(el("b",null,euro0(q.total)+(S.french?" incl. VAT":" excl. VAT")));
+    act.append(pr);
+  }else{
+    act.append(Object.assign(el("p","note"),{textContent:
+      `At ${b.area} m² this booth is below the minimum surface of every stand package. Send a request and we will look at what can be done.`}));
+  }
+  head.append(act);
   host.append(head);
 
   /* ---- a smaller stand in the same place ---- */
@@ -1687,6 +1697,7 @@ function renderDetail(){
   tg.append(toggle("French exhibitor – add 20% VAT",S.french,v=>{S.french=v;renderDetail();}));
   host.append(tg);
 
+  if(q){
   const s1=el("section","sect"); s1.append(el("h4",null,"Stand package"));
   const opts=el("div","opts");
   EQUIP.map(e=>({e,ok:eligible(b,e),q:quote(b,e.id,S.french)}))
@@ -1732,6 +1743,7 @@ function renderDetail(){
   tr.append(Object.assign(el("td"),{textContent:S.french?"Total incl. VAT":"Total excl. VAT"}),
             Object.assign(el("td","n"),{textContent:euro(q.total)}));
   tb.append(tr); t.append(tb); s3.append(t); host.append(s3);
+  }
 
   const s4=el("section","sect");
   s4.append(Object.assign(el("p","note"),{textContent:"Prototype — prices follow the JEC World 2027 published booth-cost model. Sending a request does not reserve the booth; a JEC sales contact confirms availability."}));
@@ -1796,15 +1808,19 @@ function openRequest(){
     const rows=[[S.hall+" — booth ",b().code],
                 ["Surface ",b().area+" m², "+b().open+" open sides"]];
     if(S.sub) rows.push(["Layout ",subLabel(S.sub)]);
-    rows.push(["Package ",q.eq.name],
+    if(q) rows.push(["Package ",q.eq.name],
               ["Estimate ",euro(q.total)+(S.french?" incl. VAT":" excl. VAT")]);
+    else rows.push(["Package ","below the minimum surface — to be discussed"]);
     rows.forEach(([k,v])=>{const d=el("div"); d.append(document.createTextNode(k)); d.append(el("b",null,v)); sum.append(d);});
     return sum;
   }
 
   function step1(){
     const cur=b();
-    if(!eligible(cur,EQUIP.find(e=>e.id===pick))) pick="raw";
+    const ok=EQUIP.filter(e=>eligible(cur,e));
+    if(!ok.length){ step2(); return; }
+    if(!ok.some(e=>e.id===pick))
+      pick=ok.map(e=>({e,t:quote(cur,e.id,false).total})).sort((x,y)=>x.t-y.t)[0].e.id;
     eyebrow.textContent="Step 1 of 2";
     title.textContent="Please select booth type";
     body.textContent="";
@@ -1833,13 +1849,14 @@ function openRequest(){
   }
 
   function step2(){
-    const cur=b(), q=quote(cur,pick,S.french);
-    eyebrow.textContent="Step 2 of 2";
-    title.textContent=`Booth ${cur.code} · ${q.eq.name}`;
+    const cur=b();
+    const any=EQUIP.some(e=>eligible(cur,e));
+    const q=any?quote(cur,pick,S.french):null;
+    eyebrow.textContent=any?"Step 2 of 2":"Booking request";
+    title.textContent=any?`Booth ${cur.code} · ${q.eq.name}`:`Booth ${cur.code}`;
     body.textContent="";
-    const back=el("button","back","← Change booth type");
-    back.onclick=step1;
-    body.append(back, summary(q));
+    if(any){ const back=el("button","back","← Change booth type"); back.onclick=step1; body.append(back); }
+    body.append(summary(q));
 
     const f=document.createElement("form");
     f.style.cssText="display:flex;flex-direction:column;gap:12px";
@@ -1863,14 +1880,14 @@ function openRequest(){
       const lines=[`Booth request — JEC World 2027`,`Hall: ${S.hall}`,
         `Booth: ${cur.code} (${cur.area} m², ${cur.open} open sides)`,
         `Divided: ${sub}`,
-        `Package: ${q.eq.name}`,
-        `Estimate: ${euro(q.total)} ${S.french?"incl. VAT":"excl. VAT"}`,``,
+        `Package: ${q?q.eq.name:"below the minimum surface — to be discussed"}`,
+        `Estimate: ${q?euro(q.total)+" "+(S.french?"incl. VAT":"excl. VAT"):"—"}`,``,
         `Name: ${d.fname} ${d.lname}`,`Company: ${d.company}`,`Country: ${d.country||"—"}`,
         `Email: ${d.email}`,`Phone: ${d.phone||"—"}`,``,`Message: ${d.message||"—"}`].join("\n");
       send.disabled=true; send.textContent="Sending…";
       const payload={"form-name":"booth-request",hall:S.hall,booth:cur.code,area:cur.area+" m2",
-        opensides:String(cur.open),package:q.eq.name,subdivision:sub,
-        estimate:euro(q.total)+(S.french?" incl. VAT":" excl. VAT"),...d};
+        opensides:String(cur.open),package:q?q.eq.name:"below minimum surface",subdivision:sub,
+        estimate:q?euro(q.total)+(S.french?" incl. VAT":" excl. VAT"):"-",...d};
       let sent=false;
       try{
         const r=await fetch("/",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},
