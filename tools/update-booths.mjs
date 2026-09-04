@@ -21,15 +21,23 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const API = "https://jec.ungerboeck.net/PROD/api/VFPServer/";
 
 /* The floor plan is public: no cookies, no token, no session. These are the
-   headers its own JavaScript sends; the endpoint rejects the call without them. */
+   headers its own JavaScript sends; the endpoint rejects the call without them.
+   The user-agent / origin / referer lines matter too — some servers turn away
+   requests that do not look like they came from a browser. */
 const HEADERS = {
   "content-type": "application/json",
   accept: "application/json",
+  "accept-language": "en-US,en;q=0.9",
   appcode: "VFP",
   authorization: "Bearer",
   clientappcategory: "30",
   clientapptype: "2",
   version: "26.2.9669.32536",
+  origin: "https://jec.ungerboeck.net",
+  referer: "https://jec.ungerboeck.net/PROD/app85.cshtml",
+  "user-agent":
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 " +
+    "(KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36",
 };
 
 /* VFPConfigID for the JEC World 2027 public plan — the `aat=` token in the
@@ -41,18 +49,56 @@ const VFP_CONFIG_ID = 33;
 const ZONE =
   /PAVILION|PAVILLON|AGORA|INNOVATION PLANET|INNOVATION AWARDS|STARTUP BOOSTER|STARTUP VILLAGE|LIVE DEMO|REST AREA|TERRACE RESTAURANT|VIP LOUNGE|VIP ROOM|LE CLUB|BUSINESS MEETING|VESTIAIRE|TV STUDIO|SALES OFFICE|CIRCULARITY VILLAGE|CLUBTEX|PRESS CLUB|SPEAKER ROOM|SLIDE BAR|OPEN STAGE|CAMPUS & CAREERS|10 YEARS STARTUP/i;
 
-async function call(method, args) {
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+async function callOnce(method, args) {
   const res = await fetch(API + method, {
     method: "POST",
     headers: HEADERS,
     body: JSON.stringify(args),
   });
-  if (!res.ok) throw new Error(`${method} → HTTP ${res.status}`);
-  const wrapper = await res.json();
-  const payload = JSON.parse(wrapper[0]);
+
+  const text = await res.text();
+
+  if (!res.ok) {
+    throw new Error(
+      `${method} → HTTP ${res.status} ${res.statusText}\n` +
+        `  first 300 characters of the reply:\n  ${text.slice(0, 300).replace(/\s+/g, " ")}`
+    );
+  }
+  if (!text.trim().startsWith("[")) {
+    throw new Error(
+      `${method} → expected JSON, got something else (the server may be showing a ` +
+        `block page or a login screen)\n  first 300 characters:\n  ${text.slice(0, 300).replace(/\s+/g, " ")}`
+    );
+  }
+
+  let payload;
+  try {
+    payload = JSON.parse(JSON.parse(text)[0]);
+  } catch (e) {
+    throw new Error(`${method} → could not read the reply as JSON: ${e.message}`);
+  }
   if (payload.ServerCallSuccessFail === false)
-    throw new Error(`${method} → ${payload.ErrorMessage}`);
+    throw new Error(`${method} → the floor plan service said: ${payload.ErrorMessage}`);
+  if (!payload.ReturnObj) throw new Error(`${method} → reply had no data in it`);
   return payload.ReturnObj;
+}
+
+async function call(method, args) {
+  let lastError;
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      return await callOnce(method, args);
+    } catch (err) {
+      lastError = err;
+      if (attempt < 3) {
+        console.log(`  attempt ${attempt} failed (${err.message.split("\n")[0]}) — retrying…`);
+        await sleep(attempt * 4000);
+      }
+    }
+  }
+  throw lastError;
 }
 
 /**
@@ -123,9 +169,24 @@ function packBooth(code, area, openSides, status, name, points) {
 }
 
 async function main() {
+  console.log(`· node ${process.version}, working folder ${ROOT}`);
+
+  // fail early and clearly if the repository is missing files
+  for (const needed of ["index.html", "tools/update-booths.mjs"]) {
+    try {
+      await readFile(resolve(ROOT, needed));
+    } catch {
+      throw new Error(
+        `${needed} is missing from the repository. Upload the whole contents of the ` +
+          `"site" folder (index.html, data, tools) and run this again.`
+      );
+    }
+  }
+
   let overrides = { reserved: {}, zones: {} };
   try {
     overrides = JSON.parse(await readFile(resolve(ROOT, "tools/overrides.json"), "utf8"));
+    console.log(`· overrides: ${Object.keys(overrides.reserved || {}).length} reserved booths`);
   } catch {
     console.warn("! tools/overrides.json not found — continuing without manual overrides");
   }
@@ -153,13 +214,17 @@ async function main() {
   for (const { drawingName, drawingSeq } of AvailableDrawingList) {
     const drawing = await call("GetDrawingData", [OrgCode, EventID, ConfigCode, drawingSeq, "*"]);
 
+    /* Every piece of text on the drawing, with where it sits. The name the
+       official plan prints inside a booth is the authority: it also marks
+       booths that are already allocated (national pavilions, group stands,
+       "RESERVED" blocks) while their Availability field still reads 0. */
     const byId = new Map();
-    const zoneLabels = [];
+    const labels = [];
     for (const layer of drawing.drawing.Layers) {
       for (const el of layer.Elements) {
         if (el.ElementID) byId.set(el.ElementID, el);
-        if (el.ElementType === 1 && el.Text && el.OriginPoint && ZONE.test(el.Text)) {
-          zoneLabels.push({
+        if (el.ElementType === 1 && el.Text && el.OriginPoint) {
+          labels.push({
             text: el.Text.replace(/\s+/g, " ").trim().replace(/^\*/, ""),
             at: [el.OriginPoint.X, el.OriginPoint.Y],
           });
@@ -177,14 +242,25 @@ async function main() {
       if (!pts) continue;
 
       const code = booth.AssignCode;
-      let name = nameOf.get(code) || "";
-      let status = booth.Availability === 0 ? 0 : 1;
+      const bare = (s) => s.toUpperCase().replace(/[^A-Z0-9]/g, "");
 
-      // show zone: a zone label sits inside the booth, or the exhibitor is one
-      let zone = "";
-      for (const l of zoneLabels) if (pointInPolygon(l.at, pts)) { zone = l.text; break; }
-      if (!zone && ZONE.test(name)) zone = name;
-      if (zone) { status = 2; name = zone; }
+      // what the plan itself prints inside this booth, minus its number,
+      // its area and the dimension marks
+      const printed = labels
+        .filter((l) => pointInPolygon(l.at, pts))
+        .map((l) => l.text)
+        .filter((s) => s && bare(s) !== bare(code) && !/^\d+([.,]\d+)?\s*(m²|m2|sqm|m)?$/i.test(s))
+        .map((s) => s.replace(/\b\d+([.,]\d+)?\s*(m²|m2|sqm|m)\b/gi, "").trim())
+        .filter(Boolean)
+        .join(" ")
+        .replace(/\s+/g, " ")
+        .trim();
+
+      let name = printed || nameOf.get(code) || "";
+      // a booth the plan has already written a name on is not on sale, whatever
+      // its Availability field says
+      let status = booth.Availability === 0 && !printed ? 0 : 1;
+      if (ZONE.test(name)) status = 2;
 
       // manual overrides
       for (const [prefix, label] of Object.entries(zonePrefixes))
@@ -212,6 +288,16 @@ async function main() {
 }
 
 main().catch((err) => {
-  console.error("Update failed:", err.message);
+  console.error("");
+  console.error("======================================================");
+  console.error("UPDATE FAILED");
+  console.error("======================================================");
+  console.error(err.message);
+  if (err.cause) console.error("cause:", err.cause.message || err.cause);
+  console.error("");
+  console.error("If this says HTTP 403 / 429, or shows a block page, the floor plan");
+  console.error("service is refusing requests from GitHub's servers. Everything else");
+  console.error("on the site keeps working — only the daily refresh is affected.");
+  console.error("======================================================");
   process.exit(1);
 });
